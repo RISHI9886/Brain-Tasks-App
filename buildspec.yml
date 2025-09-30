@@ -33,3 +33,8 @@ artifacts:
     - deployment.yaml
     - service.yaml
 
+mapRoles: |
+  - rolearn: arn:aws:iam::275057777725:role/codebuild-brain-tasks-role
+    username: codebuild
+    groups:
+      - system:masters
