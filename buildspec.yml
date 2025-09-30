@@ -23,8 +23,8 @@ phases:
 
       - echo "Writing Kubernetes manifests..."
       - sed -i "s|<IMAGE_URI>|275057777725.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest|" k8s/deployment.yaml
-      - kubectl apply -f deployment.yaml
-      - kubectl apply -f service.yaml
+      - kubectl apply -f k8s/deployment.yaml
+      - kubectl apply -f k8s/service.yaml
 
 artifacts:
   files:
