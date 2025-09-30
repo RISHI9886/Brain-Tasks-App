@@ -5,24 +5,29 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - ACCOUNT_ID=275057777725
       - REGION=us-east-1
       - REPO_NAME=brain-tasks-app
       - IMAGE_URI=275057777725.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 275057777725.dkr.ecr.us-east-1.amazonaws.com
+
   build:
     commands:
       - echo Build started on `date`
-      - docker build -t $IMAGE_URI .
+      - docker build -t 275057777725.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest .
+
   post_build:
     commands:
       - echo Build completed on `date`
-      - docker push $IMAGE_URI
-      - echo "Writing Kubernetes manifests..."
-      - - sed -i "s|275057777725.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest|$IMAGE_URI|" k8s/deployment.yaml
-      - kubectl apply -f k8s/deployment.yaml
-      - kubectl apply -f k8s/service.yaml
+      - docker push 275057777725.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest
 
+      - echo "Writing Kubernetes manifests..."
+      - sed -i "s|<IMAGE_URI>|275057777725.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest|" k8s/deployment.yaml
+      - kubectl apply -f deployment.yaml
+      - kubectl apply -f service.yaml
+
+artifacts:
   files:
-    - k8s/*.yaml
-    - buildspec.yml
+    - deployment.yaml
+    - service.yaml
+
