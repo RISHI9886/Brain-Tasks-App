@@ -5,8 +5,9 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: brain-tasks-app
+    app: brain-tasks
   ports:
     - protocol: TCP
       port: 80
       targetPort: 3000
+

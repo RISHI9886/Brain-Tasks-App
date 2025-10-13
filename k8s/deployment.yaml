@@ -6,15 +6,15 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: brain-tasks-app
+      app: brain-tasks
   template:
     metadata:
       labels:
-        app: brain-tasks-app
+        app: brain-tasks
     spec:
       containers:
-      - name: brain-tasks-container
-        image: 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
-        ports:
-        - containerPort: 3000
-        imagePullPolicy: Always
+        - name: brain-tasks-container
+          image: 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
+          ports:
+            - containerPort: 3000
+
