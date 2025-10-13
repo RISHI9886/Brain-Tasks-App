@@ -10,7 +10,7 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - ACCOUNT_ID=275057777725
-      - IMAGE_URI=275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - IMAGE_URI=275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
       - aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin 275057777725.dkr.ecr.us-west-1.amazonaws.com
   build:
     commands:
