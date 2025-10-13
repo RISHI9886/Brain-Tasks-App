@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brain-tasks-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: brain-tasks-app
+  template:
+    metadata:
+      labels:
+        app: brain-tasks-app
+    spec:
+      containers:
+      - name: brain-tasks-container
+        image: 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always

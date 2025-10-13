@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  variables:
+    REGION: "us-west-1"
+    CLUSTER_NAME: "brain-tasks-cluster"
+    ECR_REPO_NAME: "brain-tasks-app"
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - ACCOUNT_ID=275057777725
+      - IMAGE_URI=275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin 275057777725.dkr.ecr.us-west-1.amazonaws.com
+  build:
+    commands:
+      - echo Building Docker image...
+      - docker build -t 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app .
+      - docker push 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app
+  post_build:
+    commands:
+      - echo Updating Kubernetes deployment...
+      - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
+      - kubectl set image deployment/brain-tasks-deployment brain-tasks-container=$IMAGE_URI
+      - kubectl rollout status deployment/brain-tasks-deployment
+artifacts:
+  files:
+    - k8s/*
