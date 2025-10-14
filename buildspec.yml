@@ -1,31 +1,29 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      - echo Installing dependencies...
+      - curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws --version
-      - ACCOUNT_ID=275057777725
-      - REGION=us-west-1
-      - REPO_NAME=brain-tasks-app
-      - IMAGE_URI=275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
       - aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin 275057777725.dkr.ecr.us-west-1.amazonaws.com
+
   build:
     commands:
-      - echo Build started on `date`
-      - docker build -t $IMAGE_URI .
+      - echo Build Docker image...
+      - docker build -t brain-tasks-app .
+      - docker tag brain-tasks-app:latest 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
+
   post_build:
     commands:
-      - echo Build completed on `date`
-      - docker push $IMAGE_URI
-      - echo "Writing Kubernetes manifests..."
-      - sed -i "s|275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest|$IMAGE_URI|" k8s/deployment.yaml
+      - echo Pushing Docker image...
+      - docker push 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
+      - echo Updating kubeconfig for EKS cluster...
+      - aws eks update-kubeconfig --region us-west-1 --name brain-tasks-cluster
+      - echo Applying Kubernetes manifests...
       - kubectl apply -f k8s/deployment.yaml
-      - kubectl apply -f k8s/service.yaml
-
-artifacts:
-  files:
-    - k8s/*.yaml
-    - buildspec.yml
-    - Dockerfile
-    - dist/**/*
