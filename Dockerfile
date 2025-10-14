@@ -1,15 +1,7 @@
-# Use Nginx as base image
-FROM nginx:alpine
-
-# Copy prebuilt React app
-COPY dist/ /usr/share/nginx/html
-
-# Copy nginx config
+# Serve pre-built React app using Nginx
+FROM public.ecr.aws/nginx/nginx:alpine
+WORKDIR /usr/share/nginx/html
+COPY dist/ .
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80 inside container
 EXPOSE 80
-
-# Start Nginx in foreground
 CMD ["nginx", "-g", "daemon off;"]
-
