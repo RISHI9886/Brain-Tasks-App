@@ -1,28 +1,31 @@
 version: 0.2
 
-env:
-  variables:
-    REGION: "us-west-1"
-    CLUSTER_NAME: "brain-tasks-cluster"
-    ECR_REPO_NAME: "brain-tasks-app"
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
+      - aws --version
       - ACCOUNT_ID=275057777725
+      - REGION=us-west-1
+      - REPO_NAME=brain-tasks-app
       - IMAGE_URI=275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest
       - aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin 275057777725.dkr.ecr.us-west-1.amazonaws.com
   build:
     commands:
-      - echo Building Docker image...
-      - docker build -t 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app .
-      - docker push 275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app
+      - echo Build started on `date`
+      - docker build -t $IMAGE_URI .
   post_build:
     commands:
-      - echo Updating Kubernetes deployment...
-      - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
-      - kubectl set image deployment/brain-tasks-deployment brain-tasks-container=275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app
-      - kubectl rollout status deployment/brain-tasks-deployment
+      - echo Build completed on `date`
+      - docker push $IMAGE_URI
+      - echo "Writing Kubernetes manifests..."
+      - sed -i "s|275057777725.dkr.ecr.us-west-1.amazonaws.com/brain-tasks-app:latest|$IMAGE_URI|" k8s/deployment.yaml
+      - kubectl apply -f k8s/deployment.yaml
+      - kubectl apply -f k8s/service.yaml
+
 artifacts:
   files:
-    - k8s/*
+    - k8s/*.yaml
+    - buildspec.yml
+    - Dockerfile
+    - dist/**/*
