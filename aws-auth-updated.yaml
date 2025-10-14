@@ -14,8 +14,7 @@ data:
       username: codebuild
       groups:
         - system:masters
-    - rolearn: arn:aws:iam::275057777725:role/brain-tasks-pipeline
+    - rolearn: arn:aws:iam::275057777725:role/AWSCodePipelineServiceRole-us-west-1-brain-tasks-pipeline
       username: codepipeline
       groups:
         - system:masters
-
